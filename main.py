@@ -13,6 +13,8 @@ IMAGES = {}
 
 clicks = [] # (row of click 1, column of click 1, row of click 2, column of click 2)
 
+
+
 # Create a hashmap of images that maps "piece_name : image"
 
 def loadImages():
@@ -42,27 +44,31 @@ def movePiece(bs):
     clicks.append(c)
 
     if len(clicks) == 4: # on second click the player moves the peice from a to b
-        temp = bs.board[clicks[0]][clicks[1]]
-        bs.board[clicks[0]][clicks[1]] = '..'
-        bs.board[clicks[2]][clicks[3]] = temp
+        if checkValidMove(bs) == True:
+            temp = bs.board[clicks[0]][clicks[1]]
+            bs.board[clicks[0]][clicks[1]] = '..'
+            bs.board[clicks[2]][clicks[3]] = temp
 
-        # keep track of both king locations
-        if temp == 'bK':
-            bs.blackKingLocation = (r, c)
-        elif temp == 'wK':
-            bs.whiteKingLocation = (r, c)
+            # keep track of both king locations
+            if temp == 'bK':
+                bs.blackKingLocation = (r, c)
+            elif temp == 'wK':
+                bs.whiteKingLocation = (r, c)
 
         clicks.clear()
-        
 
-# def checkCheck(bs): 
-#     for r in range(DIMENSION):
-#         for c in range(DIMENSION):
-#             if bs.whiteTurn = 
-
-
-
-
+def checkValidMove(bs):
+    pieceClickedOn = bs.board[clicks[0]][clicks[1]][1]
+    destination = (clicks[2], clicks[3])
+    if pieceClickedOn == 'P':
+        bs.allPawnMoves(clicks, DIMENSION)
+    
+    if destination in bs.validMoves:
+        bs.validMoves.clear()
+        return True
+    else:
+        return False
+    
 def main():
     pygame.init()
     run = True
@@ -78,7 +84,6 @@ def main():
                 run = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 movePiece(bs)
-                # checkCheck(bs)
 
         drawBoard(bs, window)
         clock.tick(FPS)
