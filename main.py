@@ -62,6 +62,17 @@ def checkValidMove(bs):
     destination = (clicks[2], clicks[3])
     if pieceClickedOn == 'P':
         bs.allPawnMoves(clicks, DIMENSION)
+    elif pieceClickedOn == 'N':
+        bs.allKnightMoves(clicks, DIMENSION)
+    elif pieceClickedOn == 'B':
+        bs.allBishopMoves(clicks, DIMENSION)
+    elif pieceClickedOn == 'R':
+        bs.allRookMoves(clicks, DIMENSION)
+    elif pieceClickedOn == 'Q':
+        bs.allRookMoves(clicks, DIMENSION)
+        bs.allBishopMoves(clicks, DIMENSION)
+    elif pieceClickedOn == 'K':
+        bs.allKingMoves(clicks, DIMENSION)
     
     if destination in bs.validMoves:
         bs.validMoves.clear()

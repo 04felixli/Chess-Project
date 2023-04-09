@@ -34,13 +34,6 @@ class Board:
                 else: 
                     destinationRow = currentRow + 1
 
-            # if pieceColor == 'w':
-            #     if currentRow - 1 >= 0: # check piece will still be in board
-            #         destinationRow = currentRow - 1
-            # else:
-            #     if currentRow + 1 < DIMENSION: # check piece will still be in board
-            #         destinationRow = currentRow + 1
-
             if destinationColumn == currentColumn: # move up one square 
                     if self.checkPieceInPath(destinationRow, destinationColumn) == False: # pawn cannot take moving forward
                         self.validMoves.append((destinationRow, destinationColumn))
@@ -57,16 +50,84 @@ class Board:
         if pieceColor == 'b' and currentRow == 1:
             if self.checkPieceInPath(currentRow + 2, currentColumn) == False:
                 self.validMoves.append((currentRow + 2, currentColumn))
-            
+    
+    # generate all possible moves for a knight
+    def allKnightMoves(self, clicks, DIMENSION):
+        currentRow = clicks[0] # row the knight is on before being moved
+        currentColumn = clicks[1] # column the knight is on before being moved
 
+        # All possible vertical and horizontal movements of knight: eg.(verticalMoves[0], horizontalMoves[0])
+        verticalMoves = [-2, -2, -1, -1, 1, 1, 2, 2]
+        horizontalMoves = [-1, 1, -2, 2, 2, -2, -1, 1]
 
+        # add up to 8 possibilities of moves for a knight
+        for i in range(8):
+            # Calculate the new position of the knight
+            destinationRow = currentRow + verticalMoves[i]
+            destinationColumn = currentColumn + horizontalMoves[i]
 
-        
+            # Check if the new position is on the board
+            if 0 <= destinationRow < DIMENSION and 0 <= destinationColumn < DIMENSION:
+                self.addMove(destinationRow, destinationColumn, currentRow, currentColumn)
+    
+    # generate all possible moves for a bishop
+    def allBishopMoves(self, clicks, DIMENSION):
+        currentRow = clicks[0] # row the bishop is on before being moved
+        currentColumn = clicks[1] # column the bishop is on before being moved
 
-        
-        
-        
+        # Bishop can move in 4 directions, represented by a tuple: eg. down and right = (1, 1)
+        diagonalMoves = [(1, 1), (-1, -1), (-1, 1), (1, -1)]
 
+        for move in diagonalMoves:
+            for i in range(1, DIMENSION): # i represents how many diagonal squares the bishop travels up to a max of 8 
+                                          # (from one corner to the opposite corner is 8 squares)
+                # Calculate the new position of the bishop
+                destinationRow = currentRow + move[0] * i
+                destinationColumn = currentColumn + move[1] * i
+
+                # Check if the new position is on the board
+                if 0 <= destinationRow < DIMENSION and 0 <= destinationColumn < DIMENSION:
+                    self.addMove(destinationRow, destinationColumn, currentRow, currentColumn)
+
+                    if self.checkPieceInPath(destinationRow, destinationColumn) == True: # if there is a piece in the path, stop going in this direction
+                        break
+                else: # if the bishop goes off the map, stop going in this direction
+                    break
+
+    # generate all possible moves for a rook
+    def allRookMoves(self, clicks, DIMENSION):
+        currentRow = clicks[0] # row the rook is on before being moved
+        currentColumn = clicks[1] # column the rook is on before being moved
+
+        # rook can move horizontally or vertically, but not diagonally
+        moves = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+        for move in moves:
+            for i in range(1, DIMENSION):
+                # Calculate the new position of the rook
+                destinationRow = currentRow + move[0] * i
+                destinationColumn = currentColumn + move[1] * i
+
+                # Check if the new position is on the board
+                if 0 <= destinationRow < DIMENSION and 0 <= destinationColumn < DIMENSION:
+                    self.addMove(destinationRow, destinationColumn, currentRow, currentColumn)
+                    if self.checkPieceInPath(destinationRow, destinationColumn) == True: # if there is a piece in the path, stop going in this direction
+                        break
+                else: # if the bishop goes off the map, stop going in this direction
+                    break
+
+    def allKingMoves(self, clicks, DIMENSION):
+        currentRow = clicks[0] # row the rook is on before being moved
+        currentColumn = clicks[1] # column the rook is on before being moved
+
+        moves = [(-1, -1), (-1, 1), (1, 1), (1, -1), (1, 0), (0, 1), (-1, 0), (0, -1)]
+
+        for move in moves:
+            destinationRow = currentRow + move[0]
+            destinationColumn = currentColumn + move[1]
+            # Check if the new position is on the board
+            if 0 <= destinationRow < DIMENSION and 0 <= destinationColumn < DIMENSION:
+                self.addMove(destinationRow, destinationColumn, currentRow, currentColumn)
 
     def addMove(self, destinationRow, destinationColumn, currentRow, currentColumn):
         # check if there is a piece in the way
@@ -86,6 +147,7 @@ class Board:
         else:
             return False
 
+    # check if the piece in the way is the same color as the piece being moved 
     def checkSameColor(self, destinationRow, destinationColumn, currentRow, currentColumn):
         pieceToMove = self.board[destinationRow][destinationColumn]
         pieceToReplace = self.board[currentRow][currentColumn]
