@@ -17,9 +17,9 @@ class Board:
         self.validMoves = [] # a list of all possible valid moves at a certain colors turn for the piece clicked on
 
     # generate all possible moves for a pawn 
-    def allPawnMoves(self, clicks, DIMENSION):
-        currentRow = clicks[0] # row the pawn is on before being moved
-        currentColumn = clicks[1] # column the pawn is on before being moved
+    def allPawnMoves(self, currentRow, currentColumn, DIMENSION):
+        # currentRow = clicks[0] # row the pawn is on before being moved
+        # currentColumn = clicks[1] # column the pawn is on before being moved
         pieceToMove = self.board[currentRow][currentColumn] 
         pieceColor = pieceToMove[0]
         destinationRow = currentRow
@@ -52,9 +52,9 @@ class Board:
                 self.validMoves.append((currentRow + 2, currentColumn))
     
     # generate all possible moves for a knight
-    def allKnightMoves(self, clicks, DIMENSION):
-        currentRow = clicks[0] # row the knight is on before being moved
-        currentColumn = clicks[1] # column the knight is on before being moved
+    def allKnightMoves(self, currentRow, currentColumn, DIMENSION):
+        # currentRow = clicks[0] # row the knight is on before being moved
+        # currentColumn = clicks[1] # column the knight is on before being moved
 
         # All possible vertical and horizontal movements of knight: eg.(verticalMoves[0], horizontalMoves[0])
         verticalMoves = [-2, -2, -1, -1, 1, 1, 2, 2]
@@ -71,9 +71,9 @@ class Board:
                 self.addMove(destinationRow, destinationColumn, currentRow, currentColumn)
     
     # generate all possible moves for a bishop
-    def allBishopMoves(self, clicks, DIMENSION):
-        currentRow = clicks[0] # row the bishop is on before being moved
-        currentColumn = clicks[1] # column the bishop is on before being moved
+    def allBishopMoves(self, currentRow, currentColumn, DIMENSION):
+        # currentRow = clicks[0] # row the bishop is on before being moved
+        # currentColumn = clicks[1] # column the bishop is on before being moved
 
         # Bishop can move in 4 directions, represented by a tuple: eg. down and right = (1, 1)
         diagonalMoves = [(1, 1), (-1, -1), (-1, 1), (1, -1)]
@@ -95,9 +95,9 @@ class Board:
                     break
 
     # generate all possible moves for a rook
-    def allRookMoves(self, clicks, DIMENSION):
-        currentRow = clicks[0] # row the rook is on before being moved
-        currentColumn = clicks[1] # column the rook is on before being moved
+    def allRookMoves(self, currentRow, currentColumn, DIMENSION):
+        # currentRow = clicks[0] # row the rook is on before being moved
+        # currentColumn = clicks[1] # column the rook is on before being moved
 
         # rook can move horizontally or vertically, but not diagonally
         moves = [(1, 0), (-1, 0), (0, 1), (0, -1)]
@@ -116,9 +116,10 @@ class Board:
                 else: # if the bishop goes off the map, stop going in this direction
                     break
 
-    def allKingMoves(self, clicks, DIMENSION):
-        currentRow = clicks[0] # row the rook is on before being moved
-        currentColumn = clicks[1] # column the rook is on before being moved
+    # generate all possible moves for a king
+    def allKingMoves(self, currentRow, currentColumn, DIMENSION):
+        # currentRow = clicks[0] # row the rook is on before being moved
+        # currentColumn = clicks[1] # column the rook is on before being moved
 
         moves = [(-1, -1), (-1, 1), (1, 1), (1, -1), (1, 0), (0, 1), (-1, 0), (0, -1)]
 
@@ -157,8 +158,7 @@ class Board:
             return False
         else:
             return True
-        
-
+    
 
 
 
