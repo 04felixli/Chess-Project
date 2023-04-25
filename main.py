@@ -44,33 +44,44 @@ def movePiece(bs):
     if len(clicks) == 4: # on second click the player moves the peice from a to b
         if bs.checkValidTurn(clicks) == True:
             print("It is your turn")
-            if bs.checkValidMove(clicks, DIMENSION) == True:
-                print("that is a valid move")
-                temp = bs.board[clicks[0]][clicks[1]]
-                bs.board[clicks[0]][clicks[1]] = '..'
-                pieceEaten = bs.board[clicks[2]][clicks[3]]
-                bs.board[clicks[2]][clicks[3]] = temp
+            if bs.checkMate(DIMENSION) == False:
+                print("The king is not in check")
+                bs.validMoves.clear()
+                if bs.checkValidMove(clicks, DIMENSION) == True:
+                    print("that is a valid move")
+                    temp = bs.board[clicks[0]][clicks[1]]
+                    bs.board[clicks[0]][clicks[1]] = '..'
+                    pieceEaten = bs.board[clicks[2]][clicks[3]]
+                    bs.board[clicks[2]][clicks[3]] = temp
 
-                # keep track of both king locations
-                if temp == 'bK':
-                    bs.blackKingLocation = (r, c)
-                elif temp == 'wK':
-                    bs.whiteKingLocation = (r, c)
-                
-                if bs.checkCheck(DIMENSION) == False:
-                    bs.whiteTurn = not bs.whiteTurn
-                else: 
-                    temp = bs.board[clicks[2]][clicks[3]]
-                    bs.board[clicks[2]][clicks[3]] = pieceEaten
-                    bs.board[clicks[0]][clicks[1]] = temp 
-                    
-                    # move the king location back to the original location if the move is invalid for the king
+                    # keep track of both king locations
                     if temp == 'bK':
-                        bs.blackKingLocation = (clicks[0], clicks[1])
+                        bs.blackKingLocation = (r, c)
                     elif temp == 'wK':
-                        bs.whiteKingLocation = (clicks[0], clicks[1])
-                
+                        bs.whiteKingLocation = (r, c)
+                    
+                    # if it is blacks or whites turn, check if the move results in black/white king in check 
+                    if (bs.whiteTurn == False and bs.squareAttacked(bs.blackKingLocation[0], bs.blackKingLocation[1], DIMENSION) == False) or (bs.whiteTurn == True and bs.squareAttacked(bs.whiteKingLocation[0], bs.whiteKingLocation[1], DIMENSION) == False):
+                        bs.whiteTurn = not bs.whiteTurn 
 
+                        
+
+                        # if bs.staleMate(DIMENSION) == True: 
+                        #     print("Stalemate")
+
+                            
+                    else: 
+                        temp = bs.board[clicks[2]][clicks[3]]
+                        bs.board[clicks[2]][clicks[3]] = pieceEaten
+                        bs.board[clicks[0]][clicks[1]] = temp 
+                        
+                        # move the king location back to the original location if the move is invalid for the king
+                        if temp == 'bK':
+                            bs.blackKingLocation = (clicks[0], clicks[1])
+                        elif temp == 'wK':
+                            bs.whiteKingLocation = (clicks[0], clicks[1])
+            else:
+                print("CheckMate")
 
         clicks.clear()
 
