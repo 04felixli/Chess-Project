@@ -44,43 +44,42 @@ def movePiece(bs):
     if len(clicks) == 4: # on second click the player moves the peice from a to b
         if bs.checkValidTurn(clicks) == True:
             print("It is your turn")
-            if bs.checkMate(DIMENSION) == False:
-                print("The king is not in check")
-                print("valid moves[1] is: " + str(bs.validMoves))
-                bs.validMoves.clear()
-                if bs.checkValidMove(clicks, DIMENSION) == True:
-                    print("that is a valid move")
-                    temp = bs.board[clicks[0]][clicks[1]]
-                    bs.board[clicks[0]][clicks[1]] = '..'
-                    pieceEaten = bs.board[clicks[2]][clicks[3]]
-                    bs.board[clicks[2]][clicks[3]] = temp
+            if bs.checkValidMove(clicks, DIMENSION) == True:
+                print("that is a valid move")
+                temp = bs.board[clicks[0]][clicks[1]]
+                bs.board[clicks[0]][clicks[1]] = '..'
+                pieceEaten = bs.board[clicks[2]][clicks[3]]
+                bs.board[clicks[2]][clicks[3]] = temp
 
-                    # keep track of both king locations
-                    if temp == 'bK':
-                        bs.blackKingLocation = (r, c)
-                    elif temp == 'wK':
-                        bs.whiteKingLocation = (r, c)
+                # keep track of both king locations
+                if temp == 'bK':
+                    bs.blackKingLocation = (r, c)
+                elif temp == 'wK':
+                    bs.whiteKingLocation = (r, c)
+                
+                # if it is blacks or whites turn, check if the move results in black/white king in check 
+                if (bs.whiteTurn == False and bs.check(DIMENSION) == False) or (bs.whiteTurn == True and bs.check(DIMENSION) == False):
+                    bs.whiteTurn = not bs.whiteTurn 
+                    print("This move does not put your own king in check")
+                    if bs.checkmate(DIMENSION):
+                        print("Checkmate")
+                    else:
+                        print("Not checkmate")
                     
-                    # if it is blacks or whites turn, check if the move results in black/white king in check 
-                    if (bs.whiteTurn == False and bs.squareAttacked(bs.blackKingLocation[0], bs.blackKingLocation[1], DIMENSION, 'w') == False) or (bs.whiteTurn == True and bs.squareAttacked(bs.whiteKingLocation[0], bs.whiteKingLocation[1], DIMENSION, 'b') == False):
-                        bs.whiteTurn = not bs.whiteTurn 
-
-                        # if bs.staleMate(DIMENSION) == True: 
-                        #     print("Stalemate")
-
-                            
-                    else: 
-                        temp = bs.board[clicks[2]][clicks[3]]
-                        bs.board[clicks[2]][clicks[3]] = pieceEaten
-                        bs.board[clicks[0]][clicks[1]] = temp 
+                    bs.validMoves.clear()
                         
-                        # move the king location back to the original location if the move is invalid for the king
-                        if temp == 'bK':
-                            bs.blackKingLocation = (clicks[0], clicks[1])
-                        elif temp == 'wK':
-                            bs.whiteKingLocation = (clicks[0], clicks[1])
-            else:
-                print("CheckMate")
+                else: 
+                    print("This move does put your own king in check")
+                    print(bs.board[bs.checkingPieces[0][0]][bs.checkingPieces[0][1]])
+                    temp = bs.board[clicks[2]][clicks[3]]
+                    bs.board[clicks[2]][clicks[3]] = pieceEaten
+                    bs.board[clicks[0]][clicks[1]] = temp 
+                    
+                    # move the king location back to the original location if the move is invalid for the king
+                    if temp == 'bK':
+                        bs.blackKingLocation = (clicks[0], clicks[1])
+                    elif temp == 'wK':
+                        bs.whiteKingLocation = (clicks[0], clicks[1])
 
         clicks.clear()
 
