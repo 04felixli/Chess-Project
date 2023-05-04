@@ -21,20 +21,19 @@ class Board:
         #               ['..', '..', '..', '..', '..', '..', '..', '..'],
         #               ['wR', '..', '..', '..', 'wK', '..', '..', '..']]
 
-        self.board = [['..', 'bK', '..', '..', '..', '..', '..', '..'],  # Stores the location of all pieces on a 8x8 board using a 2D array 
-                      ['..', '..', 'bB', '..', 'wQ', '..', '..', '..'],    # bR denotes "black rook" and wR denotes "white rook"
-                      ['..', '..', '..', '..', '..', '..', '..', '..'],
-                      ['..', '..', '..', '..', 'wB', '..', '..', '..'],
-                      ['..', '..', '..', '..', 'wB', '..', '..', '..'],
+        self.board = [['..', '..', '..', '..', '..', '..', '..', 'bK'],  # Stores the location of all pieces on a 8x8 board using a 2D array 
+                      ['..', '..', '..', '..', '..', '..', '..', '..'],    # bR denotes "black rook" and wR denotes "white rook"
+                      ['..', '..', '..', '..', '..', 'wQ', 'wB', '..'],
                       ['..', '..', '..', '..', '..', '..', '..', '..'],
                       ['..', '..', '..', '..', '..', '..', '..', '..'],
+                      ['..', '..', '..', '..', '..', '..', '..', '..'],
+                      ['bN', '..', '..', '..', '..', '..', '..', '..'],
                       ['wR', '..', '..', '..', 'wK', '..', '..', '..']]
 
         self.whiteTurn = True
-        self.blackKingLocation = (0, 1) 
+        self.blackKingLocation = (0, 7) 
         self.whiteKingLocation = (7, 4)
         self.validMoves = [] # a list of all possible valid moves at a certain colors turn for the piece clicked on
-        self.attackingPieces = [] # a list of all pieces that attack a certain square
         self.checkingPieces = [] # a list of all checking pieces
         self.kingMoves = [] # a list of all moves a king can make 
         self.legalMoves = [] # a list of all legal moves pieces can make. THIS IS TEMPORARY. ONCE THIS WORKS, WE WILL USE VALIDMOVES    
@@ -290,6 +289,7 @@ class Board:
                     # if we find a rook or queen of the opposing color, add it to checkingPieces
                     if ((self.board[rowToCheck][columnToCheck][1] == 'R') or (self.board[rowToCheck][columnToCheck][1] == 'Q')) and (self.board[rowToCheck][columnToCheck][0] == opposingColor):
                         self.checkingPieces.append((rowToCheck, columnToCheck))
+                        break
                     elif self.board[rowToCheck][columnToCheck] == '..': # continue in the same direction if the square is empty
                         pass
                     else: # go to next direction if the square is occupied by the same color piece
@@ -308,6 +308,7 @@ class Board:
                     # if we find a bishop or queen of the opposing color, add it to checkingPieces
                     if ((self.board[rowToCheck][columnToCheck][1] == 'B') or (self.board[rowToCheck][columnToCheck][1] == 'Q')) and (self.board[rowToCheck][columnToCheck][0] == opposingColor):
                         self.checkingPieces.append((rowToCheck, columnToCheck))
+                        break
                     elif self.board[rowToCheck][columnToCheck] == '..': # continue in the same direction if the square is empty
                         pass
                     else: # go to next direction if the square is occupied by the same color piece
@@ -631,7 +632,7 @@ class Board:
                 piece = self.board[r][c]
                 if piece[0] == color:
                     self.generateAllValidMovesForPiece(r, c, piece[1], DIMENSION)
-        
+    
         if self.legalMoves == []:
             return True
         else:
