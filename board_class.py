@@ -12,8 +12,17 @@ class Board:
         #             ['wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP'],
         #             ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR']]
 
+        # self.board = [['..', 'bK', '..', '..', '..', '..', '..', '..'],  # Stores the location of all pieces on a 8x8 board using a 2D array 
+        #               ['..', '..', 'bR', '..', 'wQ', '..', '..', '..'],    # bR denotes "black rook" and wR denotes "white rook"
+        #               ['..', '..', '..', '..', '..', '..', '..', '..'],
+        #               ['..', '..', '..', '..', 'wB', '..', '..', '..'],
+        #               ['..', '..', '..', '..', 'wB', '..', '..', '..'],
+        #               ['..', '..', '..', '..', '..', '..', '..', '..'],
+        #               ['..', '..', '..', '..', '..', '..', '..', '..'],
+        #               ['wR', '..', '..', '..', 'wK', '..', '..', '..']]
+
         self.board = [['..', 'bK', '..', '..', '..', '..', '..', '..'],  # Stores the location of all pieces on a 8x8 board using a 2D array 
-                      ['..', '..', 'bR', '..', 'wQ', '..', '..', '..'],    # bR denotes "black rook" and wR denotes "white rook"
+                      ['..', '..', 'bB', '..', 'wQ', '..', '..', '..'],    # bR denotes "black rook" and wR denotes "white rook"
                       ['..', '..', '..', '..', '..', '..', '..', '..'],
                       ['..', '..', '..', '..', 'wB', '..', '..', '..'],
                       ['..', '..', '..', '..', 'wB', '..', '..', '..'],
@@ -355,6 +364,7 @@ class Board:
                 return False
             elif len(self.checkingPieces) == 2: # if the king cannot move and it is double check, it is checkmate
                 print("It is a double check and the king cannot move")
+                print(self.checkingPieces)
                 return True
             elif self.takeCheckingPiece(self.checkingPieces[0][0], self.checkingPieces[0][1], DIMENSION): # check if checking piece can be taken
                 print("The checking piece can be taken")
@@ -523,8 +533,11 @@ class Board:
                         if 0 <= rowToCheck < DIMENSION and 0 <= columnToCheck < DIMENSION:
                             # if we find a rook or queen of the opposing color, add it to checkingPieces
                             if ((self.board[rowToCheck][columnToCheck][1] == 'R') or (self.board[rowToCheck][columnToCheck][1] == 'Q')) and (self.board[rowToCheck][columnToCheck][0] == blockingColor):
-                                print("block by queen or rook")
-                                return True
+                                self.generateAllValidMovesForPiece(rowToCheck, columnToCheck, self.board[rowToCheck][columnToCheck][1], DIMENSION) 
+                                if (rowBlock, columnBlock) in self.legalMoves:
+                                    self.legalMoves.clear()
+                                    print("block by queen or rook")
+                                    return True     
                             elif self.board[rowToCheck][columnToCheck] == '..': # continue in the same direction if the square is empty
                                 pass
                             else: # go to next direction if the square is occupied by the same color piece
@@ -542,8 +555,11 @@ class Board:
                         if 0 <= rowToCheck < DIMENSION and 0 <= columnToCheck < DIMENSION:
                             # if we find a bishop or queen of the opposing color, add it to checkingPieces
                             if ((self.board[rowToCheck][columnToCheck][1] == 'B') or (self.board[rowToCheck][columnToCheck][1] == 'Q')) and (self.board[rowToCheck][columnToCheck][0] == blockingColor):
-                                print("block by bishop or queen")
-                                return True 
+                                self.generateAllValidMovesForPiece(rowToCheck, columnToCheck, self.board[rowToCheck][columnToCheck][1], DIMENSION) 
+                                if (rowBlock, columnBlock) in self.legalMoves:
+                                    self.legalMoves.clear()
+                                    print("block by queen or bishop")
+                                    return True 
                             elif self.board[rowToCheck][columnToCheck] == '..': # continue in the same direction if the square is empty
                                 pass
                             else: # go to next direction if the square is occupied by the same color piece
@@ -559,24 +575,39 @@ class Board:
                     if 0 <= rowToCheck < DIMENSION and 0 <= columnToCheck < DIMENSION:
                         # if we find a knight of the opposing color, add it to checkingPieces
                         if self.board[rowToCheck][columnToCheck][1] == 'N' and self.board[rowToCheck][columnToCheck][0] == blockingColor: 
-                            print("block by knights")
-                            return True
+                            self.generateAllValidMovesForPiece(rowToCheck, columnToCheck, self.board[rowToCheck][columnToCheck][1], DIMENSION) 
+                            if (rowBlock, columnBlock) in self.legalMoves:
+                                self.legalMoves.clear()
+                                print("block by knight")
+                                return True
                     
                 # check for pawns that can move vertically to block check
                 if blockingColor == 'w':
                     if self.board[rowBlock + 1][columnBlock] == 'wP':
-                        print("blocked by white pawn")
-                        return True
+                        self.generateAllValidMovesForPiece(rowBlock + 1, columnBlock, self.board[rowBlock + 1][columnBlock][1], DIMENSION) 
+                        if (rowBlock, columnBlock) in self.legalMoves:
+                            self.legalMoves.clear()
+                            print("block by white pawn")
+                            return True
                     elif rowBlock + 2 == 6 and self.board[rowBlock + 2][columnBlock] == 'wP':
-                        print("blocked by white pawn2")
-                        return True
+                        self.generateAllValidMovesForPiece(rowBlock +2, columnBlock, self.board[rowBlock + 2][columnBlock][1], DIMENSION) 
+                        if (rowBlock, columnBlock) in self.legalMoves:
+                            self.legalMoves.clear()
+                            print("block by white pawn2")
+                            return True
                 else:
                     if self.board[rowBlock - 1][columnBlock] == 'bP':
-                        print("blocked by black pawn at: " + str((rowBlock-1, columnBlock)))
-                        return True
+                        self.generateAllValidMovesForPiece(rowBlock - 1, columnBlock, self.board[rowBlock - 1][columnBlock][1], DIMENSION) 
+                        if (rowBlock, columnBlock) in self.legalMoves:
+                            self.legalMoves.clear()
+                            print("block by black pawn")
+                            return True
                     elif rowBlock - 2 == 1 and self.board[rowBlock - 2][columnBlock] == 'bP':
-                        print("blocked by black pawn2")
-                        return True
+                        self.generateAllValidMovesForPiece(rowBlock - 2, columnBlock, self.board[rowBlock - 2][columnBlock][1], DIMENSION) 
+                        if (rowBlock, columnBlock) in self.legalMoves:
+                            self.legalMoves.clear()
+                            print("block by black pawn")
+                            return True
         
         return False
 
@@ -685,7 +716,6 @@ class Board:
                     break
         
         # check for knights 
-        print("checking for knights")
         for direction in checkKnights:
             rowToCheck = checkingPieceRow + direction[0]
             columnToCheck = checkingPieceColumn + direction[1]
@@ -701,23 +731,23 @@ class Board:
         # check for pawns
         if opposingColor == 'w':
             if 0 <= checkingPieceRow + 1 < DIMENSION and 0 <= checkingPieceColumn + 1 < DIMENSION and self.board[checkingPieceRow + 1][checkingPieceColumn + 1] == 'wP':
-                self.generateAllValidMovesForPiece(checkingPieceRow + 1, checkingPieceColumn + 1, self.board[checkingPieceColumn + 1][checkingPieceColumn + 1][1], DIMENSION) 
+                self.generateAllValidMovesForPiece(checkingPieceRow + 1, checkingPieceColumn + 1, self.board[checkingPieceRow + 1][checkingPieceColumn + 1][1], DIMENSION) 
                 if (checkingPieceRow, checkingPieceColumn) in self.legalMoves:
                     self.legalMoves.clear()
                     return True
             elif 0 <= checkingPieceRow + 1 < DIMENSION and 0 <= checkingPieceColumn - 1 < DIMENSION and self.board[checkingPieceRow + 1][checkingPieceColumn - 1] == 'wP':
-                self.generateAllValidMovesForPiece(checkingPieceRow + 1, checkingPieceColumn - 1, self.board[checkingPieceColumn + 1][checkingPieceColumn - 1][1], DIMENSION) 
+                self.generateAllValidMovesForPiece(checkingPieceRow + 1, checkingPieceColumn - 1, self.board[checkingPieceRow + 1][checkingPieceColumn - 1][1], DIMENSION) 
                 if (checkingPieceRow, checkingPieceColumn) in self.legalMoves:
                     self.legalMoves.clear()
                     return True 
         else:
             if 0 <= checkingPieceRow - 1 < DIMENSION and 0 <= checkingPieceColumn - 1 < DIMENSION and self.board[checkingPieceRow - 1][checkingPieceColumn - 1] == 'bP':
-                self.generateAllValidMovesForPiece(checkingPieceRow - 1, checkingPieceColumn - 1, self.board[checkingPieceColumn - 1][checkingPieceColumn - 1][1], DIMENSION) 
+                self.generateAllValidMovesForPiece(checkingPieceRow - 1, checkingPieceColumn - 1, self.board[checkingPieceRow - 1][checkingPieceColumn - 1][1], DIMENSION) 
                 if (checkingPieceRow, checkingPieceColumn) in self.legalMoves:
                     self.legalMoves.clear()
                     return True
             elif 0 <= checkingPieceRow - 1 < DIMENSION and 0 <= checkingPieceColumn + 1 < DIMENSION and self.board[checkingPieceRow - 1][checkingPieceColumn + 1] == 'bP':
-                self.generateAllValidMovesForPiece(checkingPieceRow - 1, checkingPieceColumn + 1, self.board[checkingPieceColumn - 1][checkingPieceColumn + 1][1], DIMENSION) 
+                self.generateAllValidMovesForPiece(checkingPieceRow - 1, checkingPieceColumn + 1, self.board[checkingPieceRow - 1][checkingPieceColumn + 1][1], DIMENSION) 
                 if (checkingPieceRow, checkingPieceColumn) in self.legalMoves:
                     self.legalMoves.clear()
                     return True
@@ -750,25 +780,7 @@ class Board:
 
         return False
 
-    # checks if a move will result in their own king being in check 
-    def isLegalMove(self, currentRow, currentColumn, destinationRow, destinationColumn, DIMENSION):
-        # temp move piece to destination square
-        temp = self.board[currentRow][currentColumn] 
-        self.board[currentRow][currentColumn] = '..'
-        pieceTaken = self.board[destinationRow][destinationColumn]
-        self.board[destinationRow][destinationColumn] = temp
-
-        # check if the square the piece just moved to puts their own king in check
-        if self.check(DIMENSION) == False:
-            self.legalMoves.append((destinationRow, destinationColumn))
-        
-        # move the piece back to current square
-        self.board[currentRow][currentColumn] = self.board[destinationRow][destinationColumn]
-        self.board[destinationRow][destinationColumn] = pieceTaken
-
-                
-
-
+   
 
 
                                            
