@@ -65,7 +65,12 @@ def movePiece(bs):
                         print("Checkmate")
                     else:
                         print("Not checkmate")
-                    
+
+                        if bs.stalemate(DIMENSION):
+                            print("Stalemate")
+                        else:
+                            print("Not stalemate")
+                            
                     bs.validMoves.clear()
                         
                 else: 

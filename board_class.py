@@ -12,22 +12,23 @@ class Board:
         #             ['wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP'],
         #             ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR']]
 
-        self.board = [['..', '..', '..', '..', 'bK', '..', '..', '..'],  # Stores the location of all pieces on a 8x8 board using a 2D array 
-                    ['wR', '..', '..', '..', '..', '..', '..', '..'],    # bR denotes "black rook" and wR denotes "white rook"
-                    ['..', '..', '..', '..', '..', '..', 'wR', '..'],
+        self.board = [['..', '..', '..', '..', '..', '..', '..', '..'],  # Stores the location of all pieces on a 8x8 board using a 2D array 
+                    ['..', '..', '..', '..', '..', '..', '..', '..'],    # bR denotes "black rook" and wR denotes "white rook"
+                    ['..', '..', '..', '..', '..', '..', '..', '..'],
+                    ['..', '..', '..', 'wR', '..', 'wR', '..', '..'],
+                    ['..', '..', '..', '..', 'bK', '..', '..', '..'],
                     ['..', '..', '..', '..', '..', '..', '..', '..'],
                     ['..', '..', '..', '..', '..', '..', '..', '..'],
-                    ['..', '..', '..', '..', '..', '..', '..', '..'],
-                    ['..', '..', '..', '..', '..', '..', '..', '..'],
-                    ['..', '..', '..', '..', 'wK', '..', '..', '..']]
+                    ['..', '..', '..', 'wK', '..', '..', '..', '..']]
 
         self.whiteTurn = True
-        self.blackKingLocation = (0, 4) 
-        self.whiteKingLocation = (7, 4)
+        self.blackKingLocation = (4, 4) 
+        self.whiteKingLocation = (7, 3)
         self.validMoves = [] # a list of all possible valid moves at a certain colors turn for the piece clicked on
         self.attackingPieces = [] # a list of all pieces that attack a certain square
         self.checkingPieces = [] # a list of all checking pieces
         self.kingMoves = [] # a list of all moves a king can make 
+        self.legalMoves = [] # a list of all legal moves pieces can make. THIS IS TEMPORARY. ONCE THIS WORKS, WE WILL USE VALIDMOVES    
         
 
     # generate all possible moves for a pawn 
@@ -52,19 +53,23 @@ class Board:
             if destinationColumn == currentColumn: # move up one square 
                     if self.checkPieceInPath(destinationRow, destinationColumn) == False: # pawn cannot take moving forward
                         self.validMoves.append((destinationRow, destinationColumn))
+                        self.addLegalMove(currentRow, currentColumn, destinationRow, destinationColumn, 8)
             elif destinationColumn >= 0 and destinationColumn < DIMENSION and currentRow != 0 and currentRow != 7: # move left diagonal up or right diagonal up, check piece will still be in board.
                                                                                                                    # and make sure pawn is not at the other end of the board because then it cannot move
                 if self.checkPieceInPath(destinationRow, destinationColumn) == True and self.checkSameColor(destinationRow, destinationColumn, currentRow, currentColumn) == False:
                     self.validMoves.append((destinationRow, destinationColumn))
+                    self.addLegalMove(currentRow, currentColumn, destinationRow, destinationColumn, 8)
 
         # pawns can also move two squares up if there is nothing there and they have not been moved yet
         if pieceColor == 'w' and currentRow == 6:
             if self.checkPieceInPath(currentRow - 2, currentColumn) == False: 
                 self.validMoves.append((currentRow - 2, currentColumn))
+                self.addLegalMove(currentRow, currentColumn, currentRow - 2, currentColumn, 8)
 
         if pieceColor == 'b' and currentRow == 1:
             if self.checkPieceInPath(currentRow + 2, currentColumn) == False:
                 self.validMoves.append((currentRow + 2, currentColumn))
+                self.addLegalMove(currentRow, currentColumn, currentRow + 2, currentColumn, 8)
     
     # generate all possible moves for a knight
     def allKnightMoves(self, currentRow, currentColumn, DIMENSION):
@@ -158,6 +163,7 @@ class Board:
                     if self.squareAttacked(destinationRow, destinationColumn, DIMENSION) == False:
                         self.validMoves.append((destinationRow, destinationColumn))
                         self.kingMoves.append((destinationRow, destinationColumn))
+                        self.legalMoves.append((destinationRow, destinationColumn))
                     
                     # move the king back to current square
                     
@@ -172,8 +178,10 @@ class Board:
 
             if self.checkSameColor(destinationRow, destinationColumn, currentRow, currentColumn) == False:
                 self.validMoves.append((destinationRow, destinationColumn))
+                self.addLegalMove(currentRow, currentColumn, destinationRow, destinationColumn, 8)
         else:
             self.validMoves.append((destinationRow, destinationColumn))
+            self.addLegalMove(currentRow, currentColumn, destinationRow, destinationColumn, 8)
 
     # check if there is a piece in the way
     def checkPieceInPath(self, destinationRow, destinationColumn):
@@ -572,7 +580,47 @@ class Board:
         
         return False
 
-                
+    def stalemate(self, DIMENSION):
+        
+        self.legalMoves.clear()
+
+        # figure out what color to check for stalemate
+        if self.whiteTurn == True:
+            kingRow = self.whiteKingLocation[0]
+            kingColumn = self.whiteKingLocation[1]
+            color = 'w'
+        else:
+            kingRow = self.blackKingLocation[0]
+            kingColumn = self.blackKingLocation[1]
+            color = 'b'   
+
+        for r in range(DIMENSION):
+            for c in range(DIMENSION):
+                piece = self.board[r][c]
+                if piece[0] == color:
+                    self.generateAllValidMovesForPiece(r, c, piece[1], DIMENSION)
+        
+        print(self.legalMoves)
+        print(self.kingMoves)
+        if self.legalMoves == []:
+            return True
+        else:
+            return False
+
+    def addLegalMove(self, currentRow, currentColumn, destinationRow, destinationColumn, DIMENSION):
+        # temp move piece to destination square
+        temp = self.board[currentRow][currentColumn] 
+        self.board[currentRow][currentColumn] = '..'
+        pieceTaken = self.board[destinationRow][destinationColumn]
+        self.board[destinationRow][destinationColumn] = temp
+
+        # check if the square the piece just moved to puts their own king in check
+        if self.check(DIMENSION) == False:
+            self.legalMoves.append((destinationRow, destinationColumn))
+        
+        # move the piece back to current square
+        self.board[currentRow][currentColumn] = self.board[destinationRow][destinationColumn]
+        self.board[destinationRow][destinationColumn] = pieceTaken
 
 
         
