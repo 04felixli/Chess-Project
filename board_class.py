@@ -3,27 +3,27 @@
 
 class Board:
     def __init__(self):
-        # self.board = [['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR'],  # Stores the location of all pieces on a 8x8 board using a 2D array 
-        #             ['bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP'],    # bR denotes "black rook" and wR denotes "white rook"
-        #             ['..', '..', '..', '..', '..', '..', '..', '..'],
-        #             ['..', '..', '..', '..', '..', '..', '..', '..'],
-        #             ['..', '..', '..', '..', '..', '..', '..', '..'],
-        #             ['..', '..', '..', '..', '..', '..', '..', '..'],
-        #             ['wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP'],
-        #             ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR']]
+        self.board = [['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR'],  # Stores the location of all pieces on a 8x8 board using a 2D array 
+                    ['bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP', 'bP'],    # bR denotes "black rook" and wR denotes "white rook"
+                    ['..', '..', '..', '..', '..', '..', '..', '..'],
+                    ['..', '..', '..', '..', '..', '..', '..', '..'],
+                    ['..', '..', '..', '..', '..', '..', '..', '..'],
+                    ['..', '..', '..', '..', '..', '..', '..', '..'],
+                    ['wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP', 'wP'],
+                    ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR']]
 
-        self.board = [['..', '..', '..', '..', '..', '..', '..', '..'],  # Stores the location of all pieces on a 8x8 board using a 2D array 
-                    ['..', '..', '..', '..', '..', '..', '..', '..'],    # bR denotes "black rook" and wR denotes "white rook"
-                    ['..', '..', '..', '..', '..', '..', '..', '..'],
-                    ['..', '..', '..', 'wR', '..', 'wR', '..', '..'],
-                    ['..', '..', '..', '..', 'bK', '..', '..', '..'],
-                    ['..', '..', '..', '..', '..', '..', '..', '..'],
-                    ['..', '..', '..', '..', '..', '..', '..', '..'],
-                    ['..', '..', '..', 'wK', '..', '..', '..', '..']]
+        # self.board = [['..', 'bK', '..', '..', '..', '..', '..', '..'],  # Stores the location of all pieces on a 8x8 board using a 2D array 
+        #               ['..', '..', 'bR', '..', '..', '..', 'wR', 'wQ'],    # bR denotes "black rook" and wR denotes "white rook"
+        #               ['..', '..', '..', '..', '..', '..', '..', '..'],
+        #               ['..', '..', '..', '..', 'wB', '..', '..', '..'],
+        #               ['..', '..', '..', '..', 'wB', '..', '..', '..'],
+        #               ['..', '..', '..', '..', '..', '..', '..', '..'],
+        #               ['..', '..', '..', '..', '..', '..', '..', '..'],
+        #               ['wR', '..', '..', 'wK', '..', '..', '..', '..']]
 
         self.whiteTurn = True
-        self.blackKingLocation = (4, 4) 
-        self.whiteKingLocation = (7, 3)
+        self.blackKingLocation = (0, 4) 
+        self.whiteKingLocation = (7, 4)
         self.validMoves = [] # a list of all possible valid moves at a certain colors turn for the piece clicked on
         self.attackingPieces = [] # a list of all pieces that attack a certain square
         self.checkingPieces = [] # a list of all checking pieces
@@ -350,13 +350,15 @@ class Board:
 
             self.allKingMoves(kingRow, kingColumn, DIMENSION)
 
+            print(self.kingMoves)
+
             if self.kingMoves != []: # if the king can move, it is not checkmate
                 print("The king can move out of check")
                 return False
             elif len(self.checkingPieces) == 2: # if the king cannot move and it is double check, it is checkmate
                 print("It is a double check and the king cannot move")
                 return True
-            elif self.squareAttacked(self.checkingPieces[0][0], self.checkingPieces[0][1], DIMENSION) and self.kingMoves != []: # check if checking piece can be taken
+            elif self.takeCheckingPiece(self.checkingPieces[0][0], self.checkingPieces[0][1], DIMENSION): # check if checking piece can be taken
                 print("The checking piece can be taken")
                 return False
             elif self.blockCheck(DIMENSION): # check if check can be blocked 
@@ -368,7 +370,7 @@ class Board:
             return False
 
     # checks if a square is attacked 
-    # only works if the square attacked corresponds to whose turn it is 
+    # only works in the situation below:
     # eg. if it is black's turn, can only check if black pieces are attacked by white pieces
     def squareAttacked(self, rowAttacked, columnAttacked, DIMENSION):
         
@@ -558,7 +560,7 @@ class Board:
                     # Check if the new position is on the board
                     if 0 <= rowToCheck < DIMENSION and 0 <= columnToCheck < DIMENSION:
                         # if we find a knight of the opposing color, add it to checkingPieces
-                        if self.board[rowToCheck][columnToCheck][1] == 'N' and self.board[rowToCheck][columnToCheck][0] == blockingColor:
+                        if self.board[rowToCheck][columnToCheck][1] == 'N' and self.board[rowToCheck][columnToCheck][0] == blockingColor: 
                             print("block by knights")
                             return True
                     
@@ -580,6 +582,7 @@ class Board:
         
         return False
 
+    # checks if the game is a stalemate
     def stalemate(self, DIMENSION):
         
         self.legalMoves.clear()
@@ -600,13 +603,12 @@ class Board:
                 if piece[0] == color:
                     self.generateAllValidMovesForPiece(r, c, piece[1], DIMENSION)
         
-        print(self.legalMoves)
-        print(self.kingMoves)
         if self.legalMoves == []:
             return True
         else:
             return False
 
+    # checks if a valid move will result in their own king being in check. If it does not, the move is legal 
     def addLegalMove(self, currentRow, currentColumn, destinationRow, destinationColumn, DIMENSION):
         # temp move piece to destination square
         temp = self.board[currentRow][currentColumn] 
@@ -621,9 +623,110 @@ class Board:
         # move the piece back to current square
         self.board[currentRow][currentColumn] = self.board[destinationRow][destinationColumn]
         self.board[destinationRow][destinationColumn] = pieceTaken
-
-
         
+    # checks if a checking piece can be taken 
+    # only works in the sitatuion below:
+    # e.g. if it is black's turn, the checking piece is white, and checks for any black pieces that can attack it.
+    def takeCheckingPiece(self, checkingPieceRow, checkingPieceColumn, DIMENSION):
+
+        checkingPiece = self.board[checkingPieceRow][checkingPieceColumn]
+
+        # figure out what the opposing color is 
+        if checkingPiece[0] == 'w':
+            opposingColor = 'b'
+        else:
+            opposingColor = 'w'
+
+        # directions for types of pieces
+        checkRooks = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+        checkBishops = [(1, 1), (-1, -1), (1, -1), (-1, 1)] 
+        checkKnights = [(-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, 2), (1, -2), (2, -1), (2, 1)]
+
+        # check for rooks and queens
+        for direction in checkRooks:
+            for i in range(1, DIMENSION):
+                rowToCheck = checkingPieceRow + direction[0]*i
+                columnToCheck = checkingPieceColumn + direction[1]*i
+
+                # Check if the new position is on the board
+                if 0 <= rowToCheck < DIMENSION and 0 <= columnToCheck < DIMENSION:
+                    # if we find a rook or queen of the opposing color, the checking piece can be taken
+                    if ((self.board[rowToCheck][columnToCheck][1] == 'R') or (self.board[rowToCheck][columnToCheck][1] == 'Q')) and (self.board[rowToCheck][columnToCheck][0] == opposingColor):
+                        return True
+                    elif self.board[rowToCheck][columnToCheck] == '..': # continue in the same direction if the square is empty
+                        pass
+                    else: # go to next direction if the square is occupied by the same color piece
+                        break
+                else: # go to next direction if we go off board
+                    break
+        
+        # check for bishops and queens 
+        for direction in checkBishops:
+            for i in range(1, DIMENSION):
+                rowToCheck = checkingPieceRow + direction[0]*i
+                columnToCheck = checkingPieceColumn + direction[1]*i
+                
+                # Check if the new position is on the board
+                if 0 <= rowToCheck < DIMENSION and 0 <= columnToCheck < DIMENSION:
+                    # if we find a bishop or queen of the opposing color, the checking piece can be taken
+                    if ((self.board[rowToCheck][columnToCheck][1] == 'B') or (self.board[rowToCheck][columnToCheck][1] == 'Q')) and (self.board[rowToCheck][columnToCheck][0] == opposingColor):
+                        return True 
+                    elif self.board[rowToCheck][columnToCheck] == '..': # continue in the same direction if the square is empty
+                        pass
+                    else: # go to next direction if the square is occupied by the same color piece
+                        break
+                else:
+                    break
+        
+        # check for knights 
+        for direction in checkKnights:
+            rowToCheck = checkingPieceRow + direction[0]
+            columnToCheck = checkingPieceColumn + direction[1]
+            # Check if the new position is on the board
+            if 0 <= rowToCheck < DIMENSION and 0 <= columnToCheck < DIMENSION:
+                # if we find a knight of the opposing color, the checking piece can be taken
+                if self.board[rowToCheck][columnToCheck][1] == 'N' and self.board[rowToCheck][columnToCheck][0] == opposingColor:
+                    return True
+            
+        # check for pawns
+        if opposingColor == 'w':
+            if 0 <= checkingPieceRow + 1 < DIMENSION and 0 <= checkingPieceColumn + 1 < DIMENSION and self.board[checkingPieceRow + 1][checkingPieceColumn + 1] == 'wP':
+                return True
+            elif 0 <= checkingPieceRow + 1 < DIMENSION and 0 <= checkingPieceColumn - 1 < DIMENSION and self.board[checkingPieceRow + 1][checkingPieceColumn - 1] == 'wP':
+                return True 
+        else:
+            if 0 <= checkingPieceRow - 1 < DIMENSION and 0 <= checkingPieceColumn - 1 < DIMENSION and self.board[checkingPieceRow - 1][checkingPieceColumn - 1] == 'bP':
+                return True
+            elif 0 <= checkingPieceRow - 1 < DIMENSION and 0 <= checkingPieceColumn + 1 < DIMENSION and self.board[checkingPieceRow - 1][checkingPieceColumn + 1] == 'bP':
+                return True
+
+        # check for kings
+        for direction in checkRooks:
+            rowToCheck = checkingPieceRow + direction[0]
+            columnToCheck = checkingPieceColumn + direction[1]
+            # Check if the new position is on the board
+            if 0 <= rowToCheck < DIMENSION and 0 <= columnToCheck < DIMENSION:
+                # if we find a king of the opposing color, 
+                # we must check if the king actually has any moves and taking the checking piece doesn't put the king in check anyways
+                if self.board[rowToCheck][columnToCheck][1] == 'K' and self.board[rowToCheck][columnToCheck][0] == opposingColor:
+                    if self.kingMoves == []:
+                        return False
+                    else:
+                        return True
+        for direction in checkBishops:
+            rowToCheck = checkingPieceRow + direction[0]
+            columnToCheck = checkingPieceColumn + direction[1]
+            # Check if the new position is on the board
+            if 0 <= rowToCheck < DIMENSION and 0 <= columnToCheck < DIMENSION:
+                # if we find a king of the opposing color, 
+                # we must check if the king actually has any moves and taking the checking piece doesn't put the king in check anyways
+                if self.board[rowToCheck][columnToCheck][1] == 'K' and self.board[rowToCheck][columnToCheck][0] == opposingColor:
+                    if self.kingMoves == []:
+                        return False
+                    else:
+                        return True
+
+        return False
 
 
 
